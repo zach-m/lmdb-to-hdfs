@@ -13,8 +13,17 @@ public class LmdbToHdfs
 {
 	public static void main(String args[]) throws IOException
 	{
-		// args[0] should be the LMDB folder, e.g: "/var/imagenet/lmdb/lmdb_train"
-		// args[1] should be the HDFS file, e.g "hdfs://master:9000/imagenet/lmdb_train"
+		if (args.length != 2)
+		{
+			System.out.println("Lmdb-To-HDFS Loader");
+			System.out.println("Usage:");
+			System.out.println("  java -jar lmdbToHdfs.jar <lmdb-path> <hdfs-path>");
+			System.out.println("Where:");
+			System.out.println("  <lmdb-path> is a directory containing an LMDB database, e.g. /var/imagenet/lmdb");
+			System.out.println("  <hdfs-path> is a path for (new) sequence file on HDFS, e.g. hdfs://master:9000/imagenet/lmdb");
+			System.exit(1);
+		}
+
 		lmdbToHdfs(args[0], args[1]);
 	}
 
