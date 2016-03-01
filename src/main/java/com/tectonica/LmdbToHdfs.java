@@ -1,6 +1,7 @@
 package com.tectonica;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -13,18 +14,21 @@ public class LmdbToHdfs
 {
 	public static void main(String args[]) throws IOException
 	{
-		if (args.length != 2)
+		if (args.length < 2)
 		{
 			System.out.println("Lmdb-To-HDFS Loader");
 			System.out.println("Usage:");
-			System.out.println("  java -jar lmdbToHdfs.jar <lmdb-path> <hdfs-path>");
+			System.out.println("  java -jar lmdbToHdfs.jar <lmdb-path> <hdfs-path> [<resource-uri>..]");
 			System.out.println("Where:");
 			System.out.println("  <lmdb-path> is a directory containing an LMDB database, e.g. /var/imagenet/lmdb");
-			System.out.println("  <hdfs-path> is a path for (new) sequence file on HDFS, e.g. hdfs://master:9000/imagenet/lmdb");
+			System.out.println(
+					"  <hdfs-path> is a path for (new) sequence file on HDFS, e.g. hdfs://master:9000/imagenet/lmdb");
+			System.out.println(
+					"  <resource-uri> (0 or more values) are URIs of Hadoop configuration file, e.g. file:///usr/local/hadoop/etc/hadoop/core-site.xml");
 			System.exit(1);
 		}
 
-		lmdbToHdfs(args[0], args[1]);
+		lmdbToHdfs(args[0], args[1], Arrays.copyOfRange(args, 2, args.length));
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,10 +46,12 @@ public class LmdbToHdfs
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static void lmdbToHdfs(String lmdbPath, String hdfsSeqFile) throws IOException
+	private static void lmdbToHdfs(String lmdbPath, String hdfsSeqFile, String[] resourceUris) throws IOException
 	{
 		Configuration conf = new Configuration();
-		// conf.addResource(new Path("file:///usr/local/hadoop/etc/hadoop/core-site.xml"));
+
+		for (String resourceUri : resourceUris)
+			conf.addResource(new Path(resourceUri));
 
 		try
 		{
